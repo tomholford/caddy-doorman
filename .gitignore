@@ -1,0 +1,12 @@
+# Locally built custom Caddy binary (xcaddy / scripts/lint-caddy.sh)
+caddy
+caddy-custom
+/dist/
+
+# Env files
+.env
+*.local
+
+# OS / editor cruft
+.DS_Store
+*.swp

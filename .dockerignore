@@ -1,0 +1,4 @@
+# The image is built entirely via xcaddy (no local sources are copied in),
+# so keep the build context minimal — ship only the Dockerfile.
+*
+!Dockerfile
