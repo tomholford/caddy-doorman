@@ -1,0 +1,32 @@
+name: Lint
+
+on:
+  pull_request:
+    paths:
+      - examples/**
+      - scripts/lint-caddy.sh
+      - Dockerfile
+      - .github/workflows/lint.yml
+  push:
+    branches: [master]
+    paths:
+      - examples/**
+      - scripts/lint-caddy.sh
+      - Dockerfile
+      - .github/workflows/lint.yml
+
+jobs:
+  validate-caddyfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache custom Caddy binary
+        uses: actions/cache@v4
+        with:
+          path: caddy-custom
+          key: caddy-custom-${{ hashFiles('Dockerfile') }}
+
+      - name: Validate example Caddyfile
+        run: ./scripts/lint-caddy.sh

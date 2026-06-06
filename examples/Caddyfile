@@ -1,0 +1,62 @@
+# Example caddy-doorman configuration — exercises every bundled plugin.
+#
+# Validate it with:  ./scripts/lint-caddy.sh
+#
+# Secrets are read from the environment (your shell, an .env file, or the
+# container runtime): CLOUDFLARE_API_TOKEN, NAMECHEAP_API_KEY, NAMECHEAP_API_USER.
+{
+	email admin@example.com
+
+	# Handler order for the bundled directives: block bad IPs first, then rate
+	# limit, then proxy to the backend.
+	order defender before rate_limit
+	order rate_limit before reverse_proxy
+
+	# Trust Cloudflare's edge so {client_ip} resolves to the real visitor IP
+	# (from CF-Connecting-IP) rather than the Cloudflare edge address. The IP
+	# ranges are fetched and refreshed dynamically by caddy-ip-list.
+	servers {
+		trusted_proxies list {
+			url https://www.cloudflare.com/ips-v4
+			url https://www.cloudflare.com/ips-v6
+			interval 12h
+			timeout 15s
+		}
+		client_ip_headers CF-Connecting-IP
+	}
+}
+
+# Public app: Cloudflare DNS-01 certificates, scraper blocking, rate limiting.
+app.example.com {
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+
+	# Block known AI scrapers and cloud-provider ranges.
+	defender block {
+		ranges aws azurepubliccloud gcloud openai githubcopilot deepseek
+	}
+
+	# Per-client-IP rate limiting (keys on the real IP via trusted_proxies above).
+	rate_limit {
+		zone perip {
+			key {client_ip}
+			events 100
+			window 1m
+		}
+	}
+
+	reverse_proxy backend:8080
+}
+
+# Second site using Namecheap DNS-01 for certificates.
+wiki.example.com {
+	tls {
+		dns namecheap {
+			api_key {env.NAMECHEAP_API_KEY}
+			user {env.NAMECHEAP_API_USER}
+		}
+	}
+
+	reverse_proxy wiki:3000
+}
