@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "description": "Bump both the -builder and runtime Caddy tags together. Merging the PR changes the Dockerfile, which triggers the Build & Publish workflow.",
+      "matchManagers": ["dockerfile"],
+      "matchPackageNames": ["caddy"],
+      "groupName": "caddy base image"
+    }
+  ]
+}
