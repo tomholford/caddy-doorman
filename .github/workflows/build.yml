@@ -8,9 +8,10 @@ on:
     - cron: "0 0 1 * *"
   push:
     branches: [master]
+    # Dockerfile only. Editing this workflow does not publish; run it by
+    # hand after changing tags, platforms, or build-args.
     paths:
       - Dockerfile
-      - .github/workflows/build.yml
 
 concurrency:
   group: build-${{ github.ref }}
