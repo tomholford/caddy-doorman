@@ -8,7 +8,7 @@
 #
 # Keep the base tag pinned (caddy:X.Y.Z) so the CI workflow can derive semver
 # image tags from it, and so Renovate can open a PR when Caddy releases.
-FROM caddy:2.11.4-builder AS builder
+FROM caddy:2.11.7-builder AS builder
 
 # CACHEBUST lets the monthly CI rebuild force a fresh plugin fetch (plugins are
 # referenced unpinned, so they only move when this RUN layer is rebuilt). It is
@@ -24,6 +24,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
         --with github.com/caddy-dns/cloudflare \
         --with github.com/monobilisim/caddy-ip-list
 
-FROM caddy:2.11.4
+FROM caddy:2.11.7
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
